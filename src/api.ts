@@ -2,9 +2,9 @@ import axios, { AxiosRequestConfig } from "axios";
 import { z, ZodSchema } from "zod";
 import * as G from "./types";
 
-class APIResponse {
+class APIResponse<D> {
 	success: boolean;
-	data?: any;
+	data?: D;
 	error?: string;
 
 	constructor() {
@@ -19,7 +19,7 @@ async function APIRequest(
 	path: string,
 	config: AxiosRequestConfig,
 	expectation: ZodSchema
-): Promise<APIResponse> {
+): Promise<APIResponse<any>> {
 	const res = new APIResponse();
 	await axios
 		.get(`https://kztimerglobal.com/api/v2.0/${path}`, config)
@@ -67,7 +67,7 @@ export async function APIStatus(): Promise<{
 	return status;
 }
 
-export async function getMaps(): Promise<APIResponse> {
+export async function getMaps(): Promise<APIResponse<G.Map[]>> {
 	const res = await APIRequest(
 		"maps?",
 		{
@@ -83,7 +83,7 @@ export async function getMaps(): Promise<APIResponse> {
 
 export async function getMap(
 	mapIdentifier: number | string
-): Promise<APIResponse> {
+): Promise<APIResponse<G.Map>> {
 	const params: any = {
 		is_validated: true,
 		limit: 9999,
@@ -94,8 +94,25 @@ export async function getMap(
 	return res;
 }
 
-export async function getMapcycle(): Promise<APIResponse> {
-	const res = new APIResponse();
+export async function getMapKZGO(
+	mapName: string
+): Promise<APIResponse<G.KZGOMap>> {
+	const res = new APIResponse<G.KZGOMap>;
+	await axios
+		.get(`https://kzgo.eu/api/maps/${mapName}`)
+		.then((response) => {
+		if (G.KZGOMap.safeParse(response.data).success) {
+			res.success = true
+			res.data = response.data
+		}
+		else res.error = "KZ:GO Error."
+	})
+
+	return res
+}
+
+export async function getMapcycle(): Promise<APIResponse<string[]>> {
+	const res = new APIResponse<string[]>;
 	await axios
 		.get("https://maps.cawkz.net/mapcycles/gokz.txt")
 		.then((response) => {
@@ -110,8 +127,8 @@ export async function getMapcycle(): Promise<APIResponse> {
 export async function validateMap(
 	mapName: string,
 	mapList: G.Map[]
-): Promise<APIResponse> {
-	const res = new APIResponse();
+): Promise<APIResponse<G.Map>> {
+	const res = new APIResponse<G.Map>;
 	mapList.forEach((map) => {
 		if (map.name.includes(mapName.toLowerCase())) {
 			res.success = true;
@@ -122,8 +139,8 @@ export async function validateMap(
 	return res;
 }
 
-export function getTier(mapName: string, mapList: G.Map[]): APIResponse {
-	const res = new APIResponse();
+export function getTier(mapName: string, mapList: G.Map[]): APIResponse<number> {
+	const res = new APIResponse<number>;
 	for (let i = 0; i < mapList.length; i++) {
 		if (mapList[i].name.toLowerCase().includes(mapName)) {
 			res.success = true;
@@ -138,7 +155,29 @@ export function getTier(mapName: string, mapList: G.Map[]): APIResponse {
 export async function getFilters(
 	mapID: number,
 	course: number
-): Promise<APIResponse> {
+): Promise<APIResponse<{
+			KZT: {
+				mode: string,
+				displayMode: string,
+				abbrMode: string,
+				modeID: number,
+				icon: "❌" | "✅",
+			},
+			SKZ: {
+				mode: string,
+				displayMode: string,
+				abbrMode: string,
+				modeID: number,
+				icon: "❌" | "✅",
+			},
+			VNL: {
+				mode: string,
+				displayMode: string,
+				abbrMode: string,
+				modeID: number,
+				icon: "❌" | "✅",
+			},
+		}>> {
 	const res = await APIRequest(
 		"record_filters?",
 		{
@@ -200,14 +239,14 @@ export async function getFilters(
 	}
 }
 
-export async function getModes(): Promise<APIResponse> {
+export async function getModes(): Promise<APIResponse<G.Mode[]>> {
 	const res = await APIRequest("modes?", { params: {} }, G.Mode);
 	return res;
 }
 
 export async function getMode(
 	modeIdentifier: string | number
-): Promise<APIResponse> {
+): Promise<APIResponse<G.Mode>> {
 	const path =
 		typeof modeIdentifier === "string"
 			? `name/${modeIdentifier}`
@@ -216,7 +255,7 @@ export async function getMode(
 	return res;
 }
 
-export async function getPlayer(identifier: string): Promise<APIResponse> {
+export async function getPlayer(identifier: string): Promise<APIResponse<G.Player>> {
 	const params: any = { limit: 1 };
 	if (isSteamID(identifier)) params.steam_id = identifier;
 	else params.name = identifier;
@@ -229,7 +268,7 @@ export async function getWR(
 	course: number,
 	mode: string,
 	runtype: boolean
-): Promise<APIResponse> {
+): Promise<APIResponse<G.Record>> {
 	const params: any = {
 		tickrate: 128,
 		stage: course,
@@ -250,7 +289,7 @@ export async function getMaptop(
 	mode: string,
 	course: number,
 	runtype: boolean
-): Promise<APIResponse> {
+): Promise<APIResponse<G.Record[]>> {
 	const res = await APIRequest(
 		"records/top?",
 		{
@@ -272,7 +311,12 @@ export async function getTop(
 	mode: string | number,
 	stages: number[],
 	runtype: boolean
-): Promise<APIResponse> {
+): Promise<APIResponse<{
+	steamid64: string,
+	steam_id: string,
+	count: number,
+	player_name: string
+}>> {
 	const params: any = {
 		tickrates: 128,
 		has_teleports: runtype,
@@ -307,7 +351,7 @@ export async function getPB(
 	course: number,
 	mode: string,
 	runtype: boolean
-): Promise<APIResponse> {
+): Promise<APIResponse<G.Record>> {
 	const params: any = {
 		tickrate: 128,
 		stage: course,
@@ -330,7 +374,7 @@ export async function getTimes(
 	playerIdentifier: string,
 	mode: string,
 	runtype: boolean
-): Promise<APIResponse> {
+): Promise<APIResponse<G.Record[]>> {
 	const params: any = {
 		tickrate: 128,
 		stage: 0,
@@ -348,8 +392,8 @@ export async function getTimes(
 
 export async function getRecent(
 	playerIdentifier: string
-): Promise<APIResponse> {
-	const res = new APIResponse();
+): Promise<APIResponse<G.Record>> {
+	const res = new APIResponse<G.Record>;
 
 	const [KZT, SKZ, VNL] = [
 		await Promise.all([
@@ -372,14 +416,12 @@ export async function getRecent(
 	[KZT, SKZ, VNL].forEach((i) => {
 		i.forEach((j) => {
 			if (j.success) {
-				for (let k = 0; k < j.data.length; k++) {
-					data.push(j.data[k]);
+				for (let k = 0; k < j.data!.length; k++) {
+					data.push(j.data![k]);
 				}
 			}
 		});
 	});
-
-	console.log(data.length);
 
 	if (data.length < 1) res.error = "This player has no recent times.";
 	else {
@@ -398,7 +440,7 @@ export async function getRecent(
 	return res;
 }
 
-export async function getPlace(run: G.Record): Promise<APIResponse> {
+export async function getPlace(run: G.Record): Promise<APIResponse<number>> {
 	const res = await APIRequest(
 		`records/place/${run.id}`,
 		{ params: {} },
@@ -419,7 +461,7 @@ export async function custom(
 	path: string,
 	config: AxiosRequestConfig,
 	expectation: ZodSchema
-): Promise<APIResponse> {
+): Promise<APIResponse<any>> {
 	const res = await APIRequest(path, config, expectation);
 	return res;
 }
