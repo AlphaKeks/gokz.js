@@ -94,25 +94,38 @@ export async function getMap(
 	return res;
 }
 
+export async function getMapsKZGO(): Promise<APIResponse<G.KZGOMap[]>> {
+	const res = new APIResponse<G.KZGOMap[]>();
+	await axios
+		.get("https://kzgo.eu/api/maps")
+		.then((response) => {
+			if (G.KZGOMap.safeParse(response.data).success) {
+				res.success = true;
+				res.data = response.data;
+			} else res.error = "KZ:GO Error.";
+		})
+		.catch((e: any) => (res.error = e));
+	return res;
+}
+
 export async function getMapKZGO(
 	mapName: string
 ): Promise<APIResponse<G.KZGOMap>> {
-	const res = new APIResponse<G.KZGOMap>;
+	const res = new APIResponse<G.KZGOMap>();
 	await axios
 		.get(`https://kzgo.eu/api/maps/${mapName}`)
 		.then((response) => {
-		if (G.KZGOMap.safeParse(response.data).success) {
-			res.success = true
-			res.data = response.data
-		}
-		else res.error = "KZ:GO Error."
-	})
-
-	return res
+			if (G.KZGOMap.safeParse(response.data).success) {
+				res.success = true;
+				res.data = response.data;
+			} else res.error = "KZ:GO Error.";
+		})
+		.catch((e: any) => (res.error = e));
+	return res;
 }
 
 export async function getMapcycle(): Promise<APIResponse<string[]>> {
-	const res = new APIResponse<string[]>;
+	const res = new APIResponse<string[]>();
 	await axios
 		.get("https://maps.cawkz.net/mapcycles/gokz.txt")
 		.then((response) => {
@@ -128,7 +141,7 @@ export async function validateMap(
 	mapName: string,
 	mapList: G.Map[]
 ): Promise<APIResponse<G.Map>> {
-	const res = new APIResponse<G.Map>;
+	const res = new APIResponse<G.Map>();
 	mapList.forEach((map) => {
 		if (map.name.includes(mapName.toLowerCase())) {
 			res.success = true;
@@ -139,8 +152,11 @@ export async function validateMap(
 	return res;
 }
 
-export function getTier(mapName: string, mapList: G.Map[]): APIResponse<number> {
-	const res = new APIResponse<number>;
+export function getTier(
+	mapName: string,
+	mapList: G.Map[]
+): APIResponse<number> {
+	const res = new APIResponse<number>();
 	for (let i = 0; i < mapList.length; i++) {
 		if (mapList[i].name.toLowerCase().includes(mapName)) {
 			res.success = true;
@@ -155,29 +171,31 @@ export function getTier(mapName: string, mapList: G.Map[]): APIResponse<number> 
 export async function getFilters(
 	mapID: number,
 	course: number
-): Promise<APIResponse<{
-			KZT: {
-				mode: string,
-				displayMode: string,
-				abbrMode: string,
-				modeID: number,
-				icon: "❌" | "✅",
-			},
-			SKZ: {
-				mode: string,
-				displayMode: string,
-				abbrMode: string,
-				modeID: number,
-				icon: "❌" | "✅",
-			},
-			VNL: {
-				mode: string,
-				displayMode: string,
-				abbrMode: string,
-				modeID: number,
-				icon: "❌" | "✅",
-			},
-		}>> {
+): Promise<
+	APIResponse<{
+		KZT: {
+			mode: string;
+			displayMode: string;
+			abbrMode: string;
+			modeID: number;
+			icon: "❌" | "✅";
+		};
+		SKZ: {
+			mode: string;
+			displayMode: string;
+			abbrMode: string;
+			modeID: number;
+			icon: "❌" | "✅";
+		};
+		VNL: {
+			mode: string;
+			displayMode: string;
+			abbrMode: string;
+			modeID: number;
+			icon: "❌" | "✅";
+		};
+	}>
+> {
 	const res = await APIRequest(
 		"record_filters?",
 		{
@@ -239,6 +257,26 @@ export async function getFilters(
 	}
 }
 
+export async function getFilterDist(
+	modeID: number,
+	runtype: boolean
+): Promise<APIResponse<G.RecordFilter[]>> {
+	const res = await APIRequest(
+		"record_filters?",
+		{
+			params: {
+				stages: 0,
+				mode_ids: modeID,
+				tickrates: 128,
+				has_teleports: runtype,
+				limit: 9999,
+			},
+		},
+		G.RecordFilter
+	);
+	return res;
+}
+
 export async function getModes(): Promise<APIResponse<G.Mode[]>> {
 	const res = await APIRequest("modes?", { params: {} }, G.Mode);
 	return res;
@@ -255,7 +293,18 @@ export async function getMode(
 	return res;
 }
 
-export async function getPlayer(identifier: string): Promise<APIResponse<G.Player>> {
+const modeMap = new Map();
+modeMap.set("kz_timer", "KZT");
+modeMap.set("kz_simple", "SKZ");
+modeMap.set("kz_vanilla", "VNL");
+modeMap.set("KZT", "kz_timer");
+modeMap.set("SKZ", "kz_simple");
+modeMap.set("VNL", "kz_vanilla");
+export default modeMap;
+
+export async function getPlayer(
+	identifier: string
+): Promise<APIResponse<G.Player>> {
 	const params: any = { limit: 1 };
 	if (isSteamID(identifier)) params.steam_id = identifier;
 	else params.name = identifier;
@@ -311,12 +360,14 @@ export async function getTop(
 	mode: string | number,
 	stages: number[],
 	runtype: boolean
-): Promise<APIResponse<{
-	steamid64: string,
-	steam_id: string,
-	count: number,
-	player_name: string
-}>> {
+): Promise<
+	APIResponse<{
+		steamid64: string;
+		steam_id: string;
+		count: number;
+		player_name: string;
+	}>
+> {
 	const params: any = {
 		tickrates: 128,
 		has_teleports: runtype,
@@ -393,7 +444,7 @@ export async function getTimes(
 export async function getRecent(
 	playerIdentifier: string
 ): Promise<APIResponse<G.Record>> {
-	const res = new APIResponse<G.Record>;
+	const res = new APIResponse<G.Record>();
 
 	const [KZT, SKZ, VNL] = [
 		await Promise.all([
