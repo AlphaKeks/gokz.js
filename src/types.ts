@@ -12,7 +12,7 @@ export const Ban = z.object({
 	server_id: z.number(),
 	updated_by_id: z.string(),
 	created_on: z.string(),
-	updated_on: z.string(),
+	updated_on: z.string()
 });
 export type Ban = z.infer<typeof Ban>;
 
@@ -32,7 +32,7 @@ export const Jumpstat = z.object({
 	is_crouch_boost: z.number(),
 	updated_by_id: z.number(),
 	created_on: z.string(),
-	updated_on: z.string(),
+	updated_on: z.string()
 });
 export type Jumpstat = z.infer<typeof Jumpstat>;
 
@@ -46,7 +46,7 @@ export const Map = z.object({
 	updated_on: z.string(),
 	approved_by_steamid64: z.string(),
 	workshop_url: z.string(),
-	download_url: z.string().nullable(),
+	download_url: z.string().nullable()
 });
 export type Map = z.infer<typeof Map>;
 
@@ -63,7 +63,7 @@ export const Mode = z.object({
 	supported_tickrates: z.null(),
 	created_on: z.string(),
 	updated_on: z.string(),
-	updated_by_id: z.string(),
+	updated_by_id: z.string()
 });
 export type Mode = z.infer<typeof Mode>;
 
@@ -74,7 +74,7 @@ export const PlayerRank = z.object({
 	finishes: z.number(),
 	steamid64: z.string(),
 	steamid: z.string(),
-	player_name: z.string(),
+	player_name: z.string()
 });
 export type PlayerRank = z.infer<typeof PlayerRank>;
 
@@ -83,7 +83,7 @@ export const Player = z.object({
 	steam_id: z.string(),
 	is_banned: z.boolean(),
 	total_records: z.number(),
-	name: z.string(),
+	name: z.string()
 });
 export type Player = z.infer<typeof Player>;
 
@@ -96,7 +96,7 @@ export const RecordFilter = z.object({
 	has_teleports: z.boolean(),
 	created_on: z.string(),
 	updated_on: z.string(),
-	updated_by_id: z.string(),
+	updated_by_id: z.string()
 });
 export type RecordFilter = z.infer<typeof RecordFilter>;
 
@@ -109,7 +109,7 @@ export const RecordFilterDistribution = z.object({
 	top_scale: z.number(),
 	created_on: z.string(),
 	updated_on: z.string(),
-	updated_by_id: z.string(),
+	updated_by_id: z.string()
 });
 export type RecordFilterDistribution = z.infer<typeof RecordFilterDistribution>;
 
@@ -132,7 +132,7 @@ export const Record = z.object({
 	server_name: z.string(),
 	map_name: z.string(),
 	points: z.number(),
-	replay_id: z.number(),
+	replay_id: z.number()
 });
 export type Record = z.infer<typeof Record>;
 
@@ -141,12 +141,11 @@ export const Server = z.object({
 	port: z.number(),
 	ip: z.string(),
 	name: z.string(),
-	owner_steamid64: z.string(),
+	owner_steamid64: z.string()
 });
 export type Server = z.infer<typeof Server>;
 
 export const KZGOMap = z.object({
-	_id: z.string(),
 	name: z.string(),
 	id: z.number(),
 	tier: z.number(),
@@ -156,6 +155,6 @@ export const KZGOMap = z.object({
 	vp: z.boolean(),
 	mapperNames: z.array(z.string()),
 	mapperIds: z.array(z.string()),
-	date: z.string(),
+	date: z.string()
 });
 export type KZGOMap = z.infer<typeof KZGOMap>;

@@ -30,8 +30,7 @@ async function APIRequest(
 			) {
 				res.success = true;
 				if (response.data[0])
-					res.data =
-						response.data.length > 1 ? response.data : response.data[0];
+					res.data = response.data.length > 1 ? response.data : response.data[0];
 				else res.data = response.data;
 			} else res.error = "API Error.";
 		})
@@ -54,14 +53,14 @@ export async function APIStatus(): Promise<{
 			return {
 				status: response.data.status.description,
 				frontEnd: response.data.components[0].status,
-				backEnd: response.data.components[1].status,
+				backEnd: response.data.components[1].status
 			};
 		})
 		.catch(() => {
 			return {
 				status: "N/A",
 				frontEnd: "N/A",
-				backEnd: "N/A",
+				backEnd: "N/A"
 			};
 		});
 	return status;
@@ -73,20 +72,18 @@ export async function getMaps(): Promise<APIResponse<G.Map[]>> {
 		{
 			params: {
 				is_validated: true,
-				limit: 999,
-			},
+				limit: 999
+			}
 		},
 		G.Map
 	);
 	return res;
 }
 
-export async function getMap(
-	mapIdentifier: number | string
-): Promise<APIResponse<G.Map>> {
+export async function getMap(mapIdentifier: number | string): Promise<APIResponse<G.Map>> {
 	const params: any = {
 		is_validated: true,
-		limit: 9999,
+		limit: 9999
 	};
 	if (typeof mapIdentifier === "number") params.id = mapIdentifier;
 	else params.name = mapIdentifier;
@@ -99,7 +96,7 @@ export async function getMapsKZGO(): Promise<APIResponse<G.KZGOMap[]>> {
 	await axios
 		.get("https://kzgo.eu/api/maps")
 		.then((response) => {
-			if (G.KZGOMap.safeParse(response.data).success) {
+			if (G.KZGOMap.safeParse(response.data[0]).success) {
 				res.success = true;
 				res.data = response.data;
 			} else res.error = "KZ:GO Error.";
@@ -108,9 +105,7 @@ export async function getMapsKZGO(): Promise<APIResponse<G.KZGOMap[]>> {
 	return res;
 }
 
-export async function getMapKZGO(
-	mapName: string
-): Promise<APIResponse<G.KZGOMap>> {
+export async function getMapKZGO(mapName: string): Promise<APIResponse<G.KZGOMap>> {
 	const res = new APIResponse<G.KZGOMap>();
 	await axios
 		.get(`https://kzgo.eu/api/maps/${mapName}`)
@@ -137,10 +132,7 @@ export async function getMapcycle(): Promise<APIResponse<string[]>> {
 	return res;
 }
 
-export async function validateMap(
-	mapName: string,
-	mapList: G.Map[]
-): Promise<APIResponse<G.Map>> {
+export async function validateMap(mapName: string, mapList: G.Map[]): Promise<APIResponse<G.Map>> {
 	const res = new APIResponse<G.Map>();
 	mapList.forEach((map) => {
 		if (map.name.includes(mapName.toLowerCase())) {
@@ -152,10 +144,7 @@ export async function validateMap(
 	return res;
 }
 
-export function getTier(
-	mapName: string,
-	mapList: G.Map[]
-): APIResponse<number> {
+export function getTier(mapName: string, mapList: G.Map[]): APIResponse<number> {
 	const res = new APIResponse<number>();
 	for (let i = 0; i < mapList.length; i++) {
 		if (mapList[i].name.toLowerCase().includes(mapName)) {
@@ -204,8 +193,8 @@ export async function getFilters(
 				stages: course,
 				tickrates: 128,
 				has_teleports: false,
-				limit: 9999,
-			},
+				limit: 9999
+			}
 		},
 		G.RecordFilter
 	);
@@ -220,22 +209,22 @@ export async function getFilters(
 				displayMode: "KZTimer",
 				abbrMode: "KZT",
 				modeID: 200,
-				icon: "❌",
+				icon: "❌"
 			},
 			SKZ: {
 				mode: "kz_simple",
 				displayMode: "SimpleKZ",
 				abbrMode: "SKZ",
 				modeID: 201,
-				icon: "❌",
+				icon: "❌"
 			},
 			VNL: {
 				mode: "kz_vanilla",
 				displayMode: "Vanilla",
 				abbrMode: "VNL",
 				modeID: 202,
-				icon: "❌",
-			},
+				icon: "❌"
+			}
 		};
 
 		res.data.forEach((i: G.RecordFilter) => {
@@ -269,8 +258,8 @@ export async function getFilterDist(
 				mode_ids: modeID,
 				tickrates: 128,
 				has_teleports: runtype,
-				limit: 9999,
-			},
+				limit: 9999
+			}
 		},
 		G.RecordFilter
 	);
@@ -282,13 +271,9 @@ export async function getModes(): Promise<APIResponse<G.Mode[]>> {
 	return res;
 }
 
-export async function getMode(
-	modeIdentifier: string | number
-): Promise<APIResponse<G.Mode>> {
+export async function getMode(modeIdentifier: string | number): Promise<APIResponse<G.Mode>> {
 	const path =
-		typeof modeIdentifier === "string"
-			? `name/${modeIdentifier}`
-			: `id/${modeIdentifier}`;
+		typeof modeIdentifier === "string" ? `name/${modeIdentifier}` : `id/${modeIdentifier}`;
 	const res = await APIRequest(`modes/${path}`, { params: {} }, G.Mode);
 	return res;
 }
@@ -302,9 +287,7 @@ modeMap.set("SKZ", "kz_simple");
 modeMap.set("VNL", "kz_vanilla");
 export default modeMap;
 
-export async function getPlayer(
-	identifier: string
-): Promise<APIResponse<G.Player>> {
+export async function getPlayer(identifier: string): Promise<APIResponse<G.Player>> {
 	const params: any = { limit: 1 };
 	if (isSteamID(identifier)) params.steam_id = identifier;
 	else params.name = identifier;
@@ -323,7 +306,7 @@ export async function getWR(
 		stage: course,
 		modes_list_string: mode,
 		has_teleports: runtype,
-		limit: 1,
+		limit: 1
 	};
 
 	if (typeof mapIdentifier === "number") params.map_id = mapIdentifier;
@@ -348,8 +331,8 @@ export async function getMaptop(
 				stage: course,
 				modes_list_string: mode,
 				has_teleports: runtype,
-				limit: 100,
-			},
+				limit: 100
+			}
 		},
 		G.Record
 	);
@@ -371,7 +354,7 @@ export async function getTop(
 	const params: any = {
 		tickrates: 128,
 		has_teleports: runtype,
-		limit: 100,
+		limit: 100
 	};
 
 	if (typeof mode === "string") {
@@ -390,7 +373,7 @@ export async function getTop(
 			steamid64: z.string(),
 			steam_id: z.string(),
 			count: z.number(),
-			player_name: z.string(),
+			player_name: z.string()
 		})
 	);
 	return res;
@@ -408,7 +391,7 @@ export async function getPB(
 		stage: course,
 		modes_list_string: mode,
 		has_teleports: runtype,
-		limit: 1,
+		limit: 1
 	};
 
 	if (isSteamID(playerIdentifier)) params.steam_id = playerIdentifier;
@@ -431,7 +414,7 @@ export async function getTimes(
 		stage: 0,
 		modes_list_string: mode,
 		has_teleports: runtype,
-		limit: 9999,
+		limit: 9999
 	};
 
 	if (isSteamID(playerIdentifier)) params.steam_id = playerIdentifier;
@@ -441,24 +424,22 @@ export async function getTimes(
 	return res;
 }
 
-export async function getRecent(
-	playerIdentifier: string
-): Promise<APIResponse<G.Record>> {
+export async function getRecent(playerIdentifier: string): Promise<APIResponse<G.Record>> {
 	const res = new APIResponse<G.Record>();
 
 	const [KZT, SKZ, VNL] = [
 		await Promise.all([
 			await getTimes(playerIdentifier, "kz_timer", true),
-			await getTimes(playerIdentifier, "kz_timer", false),
+			await getTimes(playerIdentifier, "kz_timer", false)
 		]),
 		await Promise.all([
 			await getTimes(playerIdentifier, "kz_simple", true),
-			await getTimes(playerIdentifier, "kz_simple", false),
+			await getTimes(playerIdentifier, "kz_simple", false)
 		]),
 		await Promise.all([
 			await getTimes(playerIdentifier, "kz_vanilla", true),
-			await getTimes(playerIdentifier, "kz_vanilla", false),
-		]),
+			await getTimes(playerIdentifier, "kz_vanilla", false)
+		])
 	];
 
 	const data: G.Record[] = [];
@@ -492,18 +473,11 @@ export async function getRecent(
 }
 
 export async function getPlace(run: G.Record): Promise<APIResponse<number>> {
-	const res = await APIRequest(
-		`records/place/${run.id}`,
-		{ params: {} },
-		z.number()
-	);
+	const res = await APIRequest(`records/place/${run.id}`, { params: {} }, z.number());
 	return res;
 }
 
-export async function validateCourse(
-	map: G.KZGOMap,
-	course: number
-): Promise<boolean> {
+export async function validateCourse(map: G.KZGOMap, course: number): Promise<boolean> {
 	if (map.bonuses >= course) return true;
 	else return false;
 }
