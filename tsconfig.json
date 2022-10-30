@@ -1,13 +1,24 @@
 {
 	"compilerOptions": {
-		"strict": true,
+		"target": "ESNext",
+		"moduleDetection": "auto",
 		"module": "commonjs",
-		"target": "esnext",
-		"outDir": "lib",
-		"noImplicitAny": true,
+		"baseUrl": "./",
+		"rootDir": "./src/",
+		"outDir": "./lib/",
+		"moduleResolution": "node",
+		"allowJs": true,
+		"checkJs": true,
+		"strict": true,
+		"importHelpers": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"allowSyntheticDefaultImports": true,
+		"resolveJsonModule": true,
 		"forceConsistentCasingInFileNames": true,
+		"removeComments": true,
+		"sourceMap": true,
 		"declaration": true
 	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules", "lib"]
+	"exclude": ["./node_modules/", "./.prettierrc.js", "./lib/"]
 }
