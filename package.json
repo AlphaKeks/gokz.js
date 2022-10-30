@@ -1,7 +1,8 @@
 {
 	"name": "gokz.js",
-	"version": "5.0.0",
+	"version": "5.0.1",
 	"description": "Typescript wrapper for the CS:GO KZ GlobalAPI",
+	"main": "./lib/lib.js",
 	"scripts": {
 		"build": "rm -rf ./lib/* && tsc"
 	},
